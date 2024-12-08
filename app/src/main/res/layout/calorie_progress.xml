@@ -39,7 +39,9 @@
         android:gravity="center"
         android:text="X/2000"
         android:textSize="30sp"
-        tools:layout_editor_absoluteX="90dp"
-        tools:layout_editor_absoluteY="377dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/calorieLabel" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
