@@ -1,5 +1,6 @@
-package com.example.calorietracker
+package com.cs407.caloriecam
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -10,7 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.cs407.caloriecam.R
 
-class MainActivity : AppCompatActivity() {
+class CalorieTracking : AppCompatActivity() {
 
     private lateinit var etFoodName: EditText
     private lateinit var etCalories: EditText
@@ -21,6 +22,8 @@ class MainActivity : AppCompatActivity() {
     private val foodList = ArrayList<String>()
     private lateinit var adapter: ArrayAdapter<String>
     private var totalCalories = 0
+
+    private val foodImages: Map<String, Int> = emptyMap()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +63,21 @@ class MainActivity : AppCompatActivity() {
 
             } catch (e: NumberFormatException) {
                 Toast.makeText(this, "Please enter a valid number for calories", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        listViewFoods.setOnItemClickListener { parent, view, position, id ->
+            val selectedFood = foodList[position]
+            val foodName = selectedFood.split(" - ")[0]
+            val imageResourceId = foodImages[foodName]
+
+            if (imageResourceId != null) {
+                val intent = Intent(this, FoodImageActivity::class.java)
+                intent.putExtra("FOOD_NAME", foodName)
+                intent.putExtra("IMAGE_RESOURCE_ID", imageResourceId)
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "Image not available for $foodName", Toast.LENGTH_SHORT).show()
             }
         }
     }
