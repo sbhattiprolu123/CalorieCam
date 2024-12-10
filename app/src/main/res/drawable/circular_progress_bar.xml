@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- background -->
+    <item android:id="@android:id/progress">
+        <shape
+            android:useLevel="true"
+            android:innerRadiusRatio="2.5"
+            android:shape="oval"
+            android:thickness="30dp">
+            <solid android:color="#FFFFFF" /> <!-- Progress color -->
+        </shape>
+
+    </item>
 
     <!-- Progress Circle -->
     <item android:id="@android:id/progress">

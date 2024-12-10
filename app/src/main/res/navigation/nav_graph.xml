@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:startDestination="@id/HomePageFragment">
+    <fragment
+        android:id="@+id/HomePageFragment"
+        android:name="com.cs407.caloriecam.HomePageFragment"
+        android:label="Home">
+        <action
+            android:id="@+id/action_HomePageFragment_to_MealLoggingFragment"
+            app:destination="@id/MealLoggingFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/MealLoggingFragment"
+        android:name="com.cs407.caloriecam.MealLoggingFragment"
+        android:label="MealLogger"
+        />
+
+</navigation>

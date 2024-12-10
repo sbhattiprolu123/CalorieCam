@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#E5E4E2"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -10,25 +11,41 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Calorie Tracker"
-        android:textSize="24sp"
         android:layout_gravity="center"
+<<<<<<< Updated upstream
         android:layout_marginBottom="20dp" />
+=======
+        android:layout_marginBottom="20dp"
+        android:text="Calorie Tracker"
+        android:textSize="24sp" />
+>>>>>>> Stashed changes
 
     <EditText
         android:id="@+id/etFoodName"
         android:layout_width="match_parent"
+<<<<<<< Updated upstream
         android:layout_height="48dp"
     android:hint="Enter food name"
     android:inputType="text" />
+=======
+        android:layout_height="wrap_content"
+        android:hint="Enter food name"
+        android:inputType="text" />
+>>>>>>> Stashed changes
 
     <EditText
         android:id="@+id/etCalories"
         android:layout_width="match_parent"
+<<<<<<< Updated upstream
         android:layout_height="48dp"
     android:hint="Enter calories"
     android:inputType="number" />
 
+=======
+        android:layout_height="wrap_content"
+        android:hint="Enter calories"
+        android:inputType="number" />
+>>>>>>> Stashed changes
 
     <!-- Add Button -->
     <Button
@@ -49,9 +66,14 @@
         android:id="@+id/tvTotalCalories"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Total Calories: 0"
-        android:textSize="18sp"
         android:layout_gravity="center"
+<<<<<<< Updated upstream
         android:layout_marginTop="20dp" />
+=======
+        android:layout_marginTop="20dp"
+        android:background="#E5E4E2"
+        android:text="Total Calories: 0"
+        android:textSize="18sp" />
+>>>>>>> Stashed changes
 
 </LinearLayout>
