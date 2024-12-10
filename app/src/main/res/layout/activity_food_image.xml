@@ -18,5 +18,7 @@
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_gravity="center"
-        android:src="@drawable/sample_image" />
+        android:src="@android:drawable/ic_menu_gallery" />
+    <!--        android:src="@drawable/sample_image" />-->
+
 </LinearLayout>

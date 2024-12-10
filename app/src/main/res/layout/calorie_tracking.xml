@@ -13,37 +13,36 @@
         android:text="Calorie Tracker"
         android:textSize="24sp"
         android:layout_gravity="center"
-        android:marginBottom="20dp"/>
+        android:layout_marginBottom="20dp" />
 
-    <!-- Food Name Input -->
     <EditText
         android:id="@+id/etFoodName"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter food name"
-        android:inputType="text"/>
+        android:layout_height="48dp"
+    android:hint="Enter food name"
+    android:inputType="text" />
 
-    <!-- Calorie Input -->
     <EditText
         android:id="@+id/etCalories"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter calories"
-        android:inputType="number"/>
+        android:layout_height="48dp"
+    android:hint="Enter calories"
+    android:inputType="number" />
+
 
     <!-- Add Button -->
     <Button
         android:id="@+id/btnAddFood"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Food"/>
+        android:text="Add Food" />
 
     <!-- ListView for Added Foods -->
     <ListView
         android:id="@+id/listViewFoods"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
     <!-- Total Calories -->
     <TextView
@@ -53,6 +52,6 @@
         android:text="Total Calories: 0"
         android:textSize="18sp"
         android:layout_gravity="center"
-        android:marginTop="20dp"/>
+        android:layout_marginTop="20dp" />
 
 </LinearLayout>

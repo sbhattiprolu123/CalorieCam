@@ -3,9 +3,9 @@ package com.cs407.caloriecam
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
-import android.graphics.Bitmap
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.firebase.auth.FirebaseAuth
 
 class MealLoggingFragment : Fragment() {
 
@@ -41,8 +42,9 @@ class MealLoggingFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 val photo = result.data?.extras?.get("data") as? Bitmap
-                // Handle the captured photo (e.g., display or save it)
+                // Handle the captured photo
                 Toast.makeText(requireContext(), "Photo captured successfully", Toast.LENGTH_SHORT).show()
+                navigateToCalorieTracking()
             }
         }
 
@@ -50,8 +52,9 @@ class MealLoggingFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 val imageUri = result.data?.data
-                // Handle the selected image URI (e.g., display or save it)
+                // Handle the selected image URI
                 Toast.makeText(requireContext(), "Photo selected successfully", Toast.LENGTH_SHORT).show()
+                navigateToCalorieTracking()
             }
         }
 
@@ -59,14 +62,12 @@ class MealLoggingFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_meal_logging, container, false)
 
-        // Find UI elements
         val btnTakePhoto: Button = view.findViewById(R.id.btn_take_photo)
         val btnChoosePhoto: Button = view.findViewById(R.id.btn_choose_photo)
+        val btnLogout: Button = view.findViewById(R.id.btnLogout) // Add this button to the layout
 
-        // Set up button click listeners
         btnTakePhoto.setOnClickListener {
             if (checkCameraPermission()) {
                 takePhoto()
@@ -86,6 +87,14 @@ class MealLoggingFragment : Fragment() {
                 }
                 readMediaPermissionLauncher.launch(permission)
             }
+        }
+
+        btnLogout.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            val intent = Intent(requireContext(), LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+            requireActivity().finish()
         }
 
         return view
@@ -111,12 +120,10 @@ class MealLoggingFragment : Fragment() {
         val packageManager = requireActivity().packageManager
 
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-            Toast.makeText(requireContext(), "Device has a camera.", Toast.LENGTH_SHORT).show()
             val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             val resolvedActivity = takePictureIntent.resolveActivity(packageManager)
 
             if (resolvedActivity != null) {
-                Toast.makeText(requireContext(), "Camera app found.", Toast.LENGTH_SHORT).show()
                 cameraActivityLauncher.launch(takePictureIntent)
             } else {
                 Toast.makeText(requireContext(), "No camera app found.", Toast.LENGTH_SHORT).show()
@@ -126,9 +133,14 @@ class MealLoggingFragment : Fragment() {
         }
     }
 
-
     private fun choosePhotoFromGallery() {
         val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         galleryActivityLauncher.launch(galleryIntent)
+    }
+
+    private fun navigateToCalorieTracking() {
+        val intent = Intent(requireContext(), CalorieTrackingActivity::class.java)
+        startActivity(intent)
+        requireActivity().finish()
     }
 }
