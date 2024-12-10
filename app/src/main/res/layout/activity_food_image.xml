@@ -19,12 +19,6 @@
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_gravity="center"
-<<<<<<< Updated upstream
-        android:src="@android:drawable/ic_menu_gallery" />
-    <!--        android:src="@drawable/sample_image" />-->
-
-=======
         android:background="#E5E4E2"
         android:src="@drawable/food_icon_foreground" />
->>>>>>> Stashed changes
 </LinearLayout>
