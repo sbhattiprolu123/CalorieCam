@@ -85,6 +85,13 @@ class CalorieTracking : AppCompatActivity() {
             }
         }
         doneLogging.setOnClickListener(){
+            val prefs = getSharedPreferences("MY_PREFS", MODE_PRIVATE)
+            val cachedCals = prefs.getInt("total_calories", 0)
+            prefs.edit()
+                .putInt("total_calories", totalCalories+cachedCals)
+                .apply()
+
+
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
