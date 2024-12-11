@@ -74,7 +74,6 @@ class CalorieTracking : AppCompatActivity() {
             val selectedFood = foodList[position]
             val foodName = selectedFood.split(" - ")[0]
 
-            // Retrieve the associated image URL from Firebase Database
             databaseReference.orderByChild("food").equalTo(foodName).addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
@@ -97,9 +96,7 @@ class CalorieTracking : AppCompatActivity() {
         doneLogging.setOnClickListener {
             val prefs = getSharedPreferences("MY_PREFS", MODE_PRIVATE)
             val cachedCals = prefs.getInt("total_calories", 0)
-            prefs.edit()
-                .putInt("total_calories", totalCalories + cachedCals)
-                .apply()
+            prefs.edit().putInt("total_calories", totalCalories + cachedCals).apply()
 
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -111,7 +108,6 @@ class CalorieTracking : AppCompatActivity() {
     private fun showImageInDialog(foodName: String, photoUrl: String) {
         val dialogImageView = ImageView(this)
 
-        // Fetch the image from the URL in a separate thread
         Thread {
             try {
                 val url = URL(photoUrl)
@@ -139,4 +135,7 @@ class CalorieTracking : AppCompatActivity() {
             }
         }.start()
     }
+
+    // Getter method to access foodList
+    fun getFoodList(): List<String> = foodList
 }
