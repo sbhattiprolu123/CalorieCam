@@ -1,16 +1,15 @@
 package com.cs407.caloriecam
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.ListView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.database.*
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 
 class CalorieTracking : AppCompatActivity() {
 
@@ -25,13 +24,7 @@ class CalorieTracking : AppCompatActivity() {
     private lateinit var adapter: ArrayAdapter<String>
     private var totalCalories = 0
 
-    private val foodImages: Map<String, Int> = emptyMap()
-
-
-    fun getFoodList(): List<String> {
-        return foodList
-    }
-
+    private lateinit var databaseReference: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +36,8 @@ class CalorieTracking : AppCompatActivity() {
         listViewFoods = findViewById(R.id.listViewFoods)
         tvTotalCalories = findViewById(R.id.tvTotalCalories)
         doneLogging = findViewById(R.id.doneLoggingCheck)
+
+        databaseReference = FirebaseDatabase.getInstance().reference.child("meals")
 
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, foodList)
         listViewFoods.adapter = adapter
@@ -75,32 +70,73 @@ class CalorieTracking : AppCompatActivity() {
             }
         }
 
-        listViewFoods.setOnItemClickListener { parent, view, position, id ->
+        listViewFoods.setOnItemClickListener { _, _, position, _ ->
             val selectedFood = foodList[position]
             val foodName = selectedFood.split(" - ")[0]
-            val imageResourceId = foodImages[foodName]
 
-            if (imageResourceId != null) {
-                val intent = Intent(this, FoodImageActivity::class.java)
-                intent.putExtra("FOOD_NAME", foodName)
-                intent.putExtra("IMAGE_RESOURCE_ID", imageResourceId)
-                startActivity(intent)
-            } else {
-                Toast.makeText(this, "Image not available for $foodName", Toast.LENGTH_SHORT).show()
-            }
+            // Retrieve the associated image URL from Firebase Database
+            databaseReference.orderByChild("food").equalTo(foodName).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        for (mealSnapshot in snapshot.children) {
+                            val photoUrl = mealSnapshot.child("photoUrl").value.toString()
+                            showImageInDialog(foodName, photoUrl)
+                            break
+                        }
+                    } else {
+                        Toast.makeText(this@CalorieTracking, "No image found for $foodName", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(this@CalorieTracking, "Error fetching data: ${error.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
         }
-        doneLogging.setOnClickListener(){
+
+        doneLogging.setOnClickListener {
             val prefs = getSharedPreferences("MY_PREFS", MODE_PRIVATE)
             val cachedCals = prefs.getInt("total_calories", 0)
             prefs.edit()
-                .putInt("total_calories", totalCalories+cachedCals)
+                .putInt("total_calories", totalCalories + cachedCals)
                 .apply()
-
 
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             finish()
         }
+    }
+
+    private fun showImageInDialog(foodName: String, photoUrl: String) {
+        val dialogImageView = ImageView(this)
+
+        // Fetch the image from the URL in a separate thread
+        Thread {
+            try {
+                val url = URL(photoUrl)
+                val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
+                connection.doInput = true
+                connection.connect()
+
+                val inputStream: InputStream = connection.inputStream
+                val bitmap: Bitmap = BitmapFactory.decodeStream(inputStream)
+
+                runOnUiThread {
+                    val alertDialog = android.app.AlertDialog.Builder(this)
+                        .setTitle(foodName)
+                        .setView(dialogImageView)
+                        .setPositiveButton("OK", null)
+                        .create()
+
+                    dialogImageView.setImageBitmap(bitmap)
+                    alertDialog.show()
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
     }
 }

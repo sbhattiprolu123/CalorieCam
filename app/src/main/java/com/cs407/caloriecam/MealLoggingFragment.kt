@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -16,6 +17,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
+import java.io.ByteArrayOutputStream
+import java.util.*
 
 class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
 
@@ -41,9 +46,9 @@ class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 val photo = result.data?.extras?.get("data") as? Bitmap
-                // Handle the captured photo
-                Toast.makeText(requireContext(), "Photo captured successfully", Toast.LENGTH_SHORT).show()
-                navigateToCalorieTracking()
+                if (photo != null) {
+                    handleCapturedPhoto(photo)
+                }
             }
         }
 
@@ -51,11 +56,14 @@ class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 val imageUri = result.data?.data
-                // Handle the selected image URI
-                Toast.makeText(requireContext(), "Photo selected successfully", Toast.LENGTH_SHORT).show()
-                navigateToCalorieTracking()
+                if (imageUri != null) {
+                    handleSelectedPhoto(imageUri)
+                }
             }
         }
+
+    private lateinit var spinnerSelection: Spinner
+    private var selectedPhotoUri: Uri? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,24 +74,24 @@ class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
         val btnTakePhoto: Button = view.findViewById(R.id.btn_take_photo)
         val btnChoosePhoto: Button = view.findViewById(R.id.btn_choose_photo)
         val btnLogout: Button = view.findViewById(R.id.btnLogout)
-        val spinnerSelection: Spinner = view.findViewById(R.id.spinner_selection)
+        val btnUpload: Button = Button(requireContext()).apply {
+            text = "Upload"
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        (view as LinearLayout).addView(btnUpload)
 
+        spinnerSelection = view.findViewById(R.id.spinner_selection)
+
+        // Populate Spinner with foodList from CalorieTracking
         val calorieTracking = CalorieTracking()
         val foodList = calorieTracking.getFoodList()
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, foodList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerSelection.adapter = adapter
-
-        spinnerSelection.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedFood = foodList[position]
-                Toast.makeText(requireContext(), "Selected: $selectedFood", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
-        }
 
         btnTakePhoto.setOnClickListener {
             if (checkCameraPermission()) {
@@ -112,6 +120,10 @@ class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             requireActivity().finish()
+        }
+
+        btnUpload.setOnClickListener {
+            uploadData()
         }
 
         return view
@@ -153,6 +165,57 @@ class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
     private fun choosePhotoFromGallery() {
         val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         galleryActivityLauncher.launch(galleryIntent)
+    }
+
+    private fun handleCapturedPhoto(photo: Bitmap) {
+        val outputStream = ByteArrayOutputStream()
+        photo.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        val photoBytes = outputStream.toByteArray()
+        val photoUri = Uri.parse(MediaStore.Images.Media.insertImage(requireContext().contentResolver, photo, null, null))
+        selectedPhotoUri = photoUri
+        Toast.makeText(requireContext(), "Photo captured and ready to upload.", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun handleSelectedPhoto(uri: Uri) {
+        selectedPhotoUri = uri
+        Toast.makeText(requireContext(), "Photo selected and ready to upload.", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun uploadData() {
+        val selectedFood = spinnerSelection.selectedItem?.toString() ?: "No food selected"
+
+        if (selectedPhotoUri == null) {
+            Toast.makeText(requireContext(), "No photo selected to upload.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Upload the photo to Firebase Storage
+        val storageReference = FirebaseStorage.getInstance().reference
+        val photoRef = storageReference.child("meal_photos/${UUID.randomUUID()}.jpg")
+        val uploadTask = photoRef.putFile(selectedPhotoUri!!)
+
+        uploadTask.addOnSuccessListener {
+            photoRef.downloadUrl.addOnSuccessListener { uri ->
+                // Upload the food and photo URL to Firebase Database
+                val databaseReference = FirebaseDatabase.getInstance().reference.child("meals")
+                val mealId = databaseReference.push().key
+
+                val mealData = mapOf(
+                    "food" to selectedFood,
+                    "photoUrl" to uri.toString()
+                )
+
+                databaseReference.child(mealId!!).setValue(mealData).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(requireContext(), "Data uploaded successfully.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(requireContext(), "Failed to upload data.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }.addOnFailureListener {
+            Toast.makeText(requireContext(), "Failed to upload photo.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun navigateToCalorieTracking() {
