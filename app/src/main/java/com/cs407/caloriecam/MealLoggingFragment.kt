@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
+import java.io.File
 
 class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
 
@@ -42,7 +43,16 @@ class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 val photo = result.data?.extras?.get("data") as? Bitmap
-                // Handle the captured photo
+                if(photo != null){
+                    val savedPath = saveImageToInternalStorage(photo)
+                    if (savedPath != null) {
+                        // Store the path in SharedPreferences
+                        val prefs = requireContext().getSharedPreferences("MY_PREFS", AppCompatActivity.MODE_PRIVATE)
+                        prefs.edit()
+                            .putString("latest_image_path", savedPath)
+                            .apply()
+                    }
+                }
                 Toast.makeText(requireContext(), "Photo captured successfully", Toast.LENGTH_SHORT).show()
                 navigateToCalorieTracking()
             }
@@ -52,11 +62,29 @@ class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 val imageUri = result.data?.data
-                // Handle the selected image URI
+                val prefs = requireContext().getSharedPreferences("MY_PREFS", AppCompatActivity.MODE_PRIVATE)
+                prefs.edit()
+                    .putString("latest_image_uri", imageUri.toString())
+                    .apply()
                 Toast.makeText(requireContext(), "Photo selected successfully", Toast.LENGTH_SHORT).show()
                 navigateToCalorieTracking()
             }
         }
+
+    private fun saveImageToInternalStorage(bitmap: Bitmap): String? {
+        val filename = "captured_image_${System.currentTimeMillis()}.png"
+        return try {
+            val file = File(requireContext().filesDir, filename)
+            file.outputStream().use { out ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+            file.absolutePath
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -135,6 +163,7 @@ class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
 
     private fun choosePhotoFromGallery() {
         val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        galleryIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         galleryActivityLauncher.launch(galleryIntent)
     }
 

@@ -26,7 +26,6 @@ class CalorieTracking : AppCompatActivity() {
     private lateinit var adapter: ArrayAdapter<String>
     private var totalCalories = 0
 
-    private val foodImages: Map<String, Int> = emptyMap()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,16 +68,17 @@ class CalorieTracking : AppCompatActivity() {
                 Toast.makeText(this, "Please enter a valid number for calories", Toast.LENGTH_SHORT).show()
             }
         }
+        val prefs = getSharedPreferences("MY_PREFS", MODE_PRIVATE)
 
         listViewFoods.setOnItemClickListener { parent, view, position, id ->
             val selectedFood = foodList[position]
             val foodName = selectedFood.split(" - ")[0]
-            val imageResourceId = foodImages[foodName]
+            val imagePath = prefs.getString("latest_image_path", null)
+            val imageUriStr = prefs.getString("latest_image_uri", null)
 
-            if (imageResourceId != null) {
+            if (imagePath != null || imageUriStr != null) {
                 val intent = Intent(this, FoodImageActivity::class.java)
                 intent.putExtra("FOOD_NAME", foodName)
-                intent.putExtra("IMAGE_RESOURCE_ID", imageResourceId)
                 startActivity(intent)
             } else {
                 Toast.makeText(this, "Image not available for $foodName", Toast.LENGTH_SHORT).show()
