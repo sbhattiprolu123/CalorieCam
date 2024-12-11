@@ -39,7 +39,7 @@
         <activity android:name=".LoginActivity" />
 
         <!-- Calorie Tracking Activity -->
-        <activity android:name=".CalorieTrackingActivity" />
+        <activity android:name=".CalorieTracking" />
 
     </application>
 </manifest>

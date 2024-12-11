@@ -2,6 +2,7 @@ package com.cs407.caloriecam
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -13,9 +14,10 @@ class HomePageFragment : Fragment(R.layout.calorie_progress) {
         // Initialize views here
         val caloriesTextView: TextView = view.findViewById(R.id.CalorieAmount)
         val caloriesProgressView: ProgressBar = view.findViewById(R.id.progressBar)
+        val logButton: Button = view.findViewById(R.id.logButton)
         caloriesTextView.text = "VAR/2000"//TODO FIX THIS
-        caloriesProgressView.progress = 22 //TODO ALSO THIS, NEED GLOBAL VAR FOR CAL COUN
-        caloriesTextView.setOnClickListener{
+        caloriesProgressView.progress = 22 //TODO ALSO THIS, NEED GLOBAL VAR FOR CAL COUNT
+        logButton.setOnClickListener{
             findNavController().navigate(R.id.action_HomePageFragment_to_MealLoggingFragment)
         }
 

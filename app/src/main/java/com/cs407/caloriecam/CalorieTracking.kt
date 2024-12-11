@@ -2,9 +2,11 @@ package com.cs407.caloriecam
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
@@ -18,6 +20,7 @@ class CalorieTracking : AppCompatActivity() {
     private lateinit var btnAddFood: Button
     private lateinit var listViewFoods: ListView
     private lateinit var tvTotalCalories: TextView
+    private lateinit var doneLogging: ImageView
 
     private val foodList = ArrayList<String>()
     private lateinit var adapter: ArrayAdapter<String>
@@ -34,6 +37,7 @@ class CalorieTracking : AppCompatActivity() {
         btnAddFood = findViewById(R.id.btnAddFood)
         listViewFoods = findViewById(R.id.listViewFoods)
         tvTotalCalories = findViewById(R.id.tvTotalCalories)
+        doneLogging = findViewById(R.id.doneLoggingCheck)
 
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, foodList)
         listViewFoods.adapter = adapter
@@ -79,6 +83,12 @@ class CalorieTracking : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Image not available for $foodName", Toast.LENGTH_SHORT).show()
             }
+        }
+        doneLogging.setOnClickListener(){
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+            finish()
         }
     }
 }

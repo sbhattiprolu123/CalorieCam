@@ -18,8 +18,10 @@
         android:rotationX="0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.498" />
 
     <TextView
         android:id="@+id/calorieLabel"
@@ -36,15 +38,28 @@
     <TextView
         android:id="@+id/CalorieAmount"
         android:layout_width="230dp"
-        android:layout_height="57dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="337dp"
+        android:layout_marginBottom="14dp"
         android:gravity="center"
-        android:text="X/2000"
+        android:text="0/2000"
         android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/logButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/calorieLabel"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.037" />
+
+    <Button
+        android:id="@+id/logButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="84dp"
+        android:text="Start Logging!"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/calorieLabel" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

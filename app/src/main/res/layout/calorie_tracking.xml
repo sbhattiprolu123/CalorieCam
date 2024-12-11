@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#E5E4E2"
@@ -41,7 +42,7 @@
     <ListView
         android:id="@+id/listViewFoods"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="279dp"
         android:layout_weight="1" />
 
     <!-- Total Calories -->
@@ -54,4 +55,11 @@
         android:background="#E5E4E2"
         android:text="Total Calories: 0"
         android:textSize="18sp" />
+
+    <ImageView
+        android:id="@+id/doneLoggingCheck"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        app:srcCompat="@drawable/check_foreground" />
+
 </LinearLayout>

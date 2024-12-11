@@ -139,7 +139,7 @@ class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
     }
 
     private fun navigateToCalorieTracking() {
-        val intent = Intent(requireContext(), CalorieTrackingActivity::class.java)
+        val intent = Intent(requireContext(), CalorieTracking::class.java)
         startActivity(intent)
         requireActivity().finish()
     }
