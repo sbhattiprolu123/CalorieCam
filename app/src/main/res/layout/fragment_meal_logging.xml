@@ -19,11 +19,18 @@
         android:layout_marginTop="16dp"
         android:text="Choose from Gallery" />
 
+    <Spinner
+        android:id="@+id/spinner_selection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:spinnerMode="dropdown" />
+
     <Button
         android:id="@+id/btnLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Logout" />
-
 
 </LinearLayout>

@@ -11,7 +11,6 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.cs407.caloriecam.R
 
 class CalorieTracking : AppCompatActivity() {
 
@@ -27,6 +26,12 @@ class CalorieTracking : AppCompatActivity() {
     private var totalCalories = 0
 
     private val foodImages: Map<String, Int> = emptyMap()
+
+
+    fun getFoodList(): List<String> {
+        return foodList
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

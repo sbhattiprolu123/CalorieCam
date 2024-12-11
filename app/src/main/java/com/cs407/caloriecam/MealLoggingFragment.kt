@@ -10,8 +10,7 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -66,7 +65,25 @@ class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
 
         val btnTakePhoto: Button = view.findViewById(R.id.btn_take_photo)
         val btnChoosePhoto: Button = view.findViewById(R.id.btn_choose_photo)
-        val btnLogout: Button = view.findViewById(R.id.btnLogout) // Add this button to the layout
+        val btnLogout: Button = view.findViewById(R.id.btnLogout)
+        val spinnerSelection: Spinner = view.findViewById(R.id.spinner_selection)
+
+        val calorieTracking = CalorieTracking()
+        val foodList = calorieTracking.getFoodList()
+
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, foodList)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerSelection.adapter = adapter
+
+        spinnerSelection.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedFood = foodList[position]
+                Toast.makeText(requireContext(), "Selected: $selectedFood", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
 
         btnTakePhoto.setOnClickListener {
             if (checkCameraPermission()) {
