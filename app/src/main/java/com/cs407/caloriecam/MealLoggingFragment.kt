@@ -42,7 +42,6 @@ class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 val photo = result.data?.extras?.get("data") as? Bitmap
-                // Handle the captured photo
                 Toast.makeText(requireContext(), "Photo captured successfully", Toast.LENGTH_SHORT).show()
                 navigateToCalorieTracking()
             }
@@ -52,21 +51,15 @@ class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 val imageUri = result.data?.data
-                // Handle the selected image URI
                 Toast.makeText(requireContext(), "Photo selected successfully", Toast.LENGTH_SHORT).show()
                 navigateToCalorieTracking()
             }
         }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_meal_logging, container, false)
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val btnTakePhoto: Button = view.findViewById(R.id.btn_take_photo)
         val btnChoosePhoto: Button = view.findViewById(R.id.btn_choose_photo)
-        val btnLogout: Button = view.findViewById(R.id.btnLogout) // Add this button to the layout
+        val btnLogout: Button = view.findViewById(R.id.btnLogout)
 
         btnTakePhoto.setOnClickListener {
             if (checkCameraPermission()) {
@@ -96,8 +89,6 @@ class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
             startActivity(intent)
             requireActivity().finish()
         }
-
-        return view
     }
 
     private fun checkCameraPermission(): Boolean {
@@ -118,11 +109,9 @@ class MealLoggingFragment : Fragment(R.layout.fragment_meal_logging) {
 
     private fun takePhoto() {
         val packageManager = requireActivity().packageManager
-
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             val resolvedActivity = takePictureIntent.resolveActivity(packageManager)
-
             if (resolvedActivity != null) {
                 cameraActivityLauncher.launch(takePictureIntent)
             } else {

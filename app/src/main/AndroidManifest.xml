@@ -41,5 +41,7 @@
         <!-- Calorie Tracking Activity -->
         <activity android:name=".CalorieTracking" />
 
+        <activity android:name=".MealLoggingHostActivity" />
+
     </application>
 </manifest>

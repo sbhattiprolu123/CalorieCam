@@ -27,7 +27,8 @@ class LoginActivity : AppCompatActivity() {
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
-                            startActivity(Intent(this, MainActivity::class.java))
+                            // Instead of going to MainActivity, now go directly to CalorieTracking
+                            startActivity(Intent(this, CalorieTracking::class.java))
                             finish()
                         } else {
                             Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()

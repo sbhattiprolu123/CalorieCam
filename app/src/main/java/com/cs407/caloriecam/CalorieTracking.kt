@@ -2,7 +2,6 @@ package com.cs407.caloriecam
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -11,7 +10,6 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.cs407.caloriecam.R
 
 class CalorieTracking : AppCompatActivity() {
 
@@ -56,21 +54,27 @@ class CalorieTracking : AppCompatActivity() {
             try {
                 val calories = caloriesStr.toInt()
 
-                foodList.add("$foodName - $calories kcal")
-                totalCalories += calories
+                // Instead of adding immediately, store in SharedPreferences and go to MealLogging
+                val prefs = getSharedPreferences("MY_PREFS", MODE_PRIVATE)
+                prefs.edit()
+                    .putString("pending_food_name", foodName)
+                    .putInt("pending_food_calories", calories)
+                    .apply()
 
-                adapter.notifyDataSetChanged()
-                tvTotalCalories.text = "Total Calories: $totalCalories"
-
+                // Clear the input fields
                 etFoodName.text.clear()
                 etCalories.text.clear()
+
+                // Navigate to MealLoggingHostActivity which shows the MealLoggingFragment
+                val intent = Intent(this, MealLoggingHostActivity::class.java)
+                startActivity(intent)
 
             } catch (e: NumberFormatException) {
                 Toast.makeText(this, "Please enter a valid number for calories", Toast.LENGTH_SHORT).show()
             }
         }
 
-        listViewFoods.setOnItemClickListener { parent, view, position, id ->
+        listViewFoods.setOnItemClickListener { parent, _, position, _ ->
             val selectedFood = foodList[position]
             val foodName = selectedFood.split(" - ")[0]
             val imageResourceId = foodImages[foodName]
@@ -84,18 +88,40 @@ class CalorieTracking : AppCompatActivity() {
                 Toast.makeText(this, "Image not available for $foodName", Toast.LENGTH_SHORT).show()
             }
         }
-        doneLogging.setOnClickListener(){
+
+        doneLogging.setOnClickListener {
             val prefs = getSharedPreferences("MY_PREFS", MODE_PRIVATE)
             val cachedCals = prefs.getInt("total_calories", 0)
             prefs.edit()
-                .putInt("total_calories", totalCalories+cachedCals)
+                .putInt("total_calories", totalCalories + cachedCals)
                 .apply()
-
 
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             finish()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Check if there is a pending food item to add
+        val prefs = getSharedPreferences("MY_PREFS", MODE_PRIVATE)
+        val pendingFoodName = prefs.getString("pending_food_name", null)
+        val pendingFoodCalories = prefs.getInt("pending_food_calories", -1)
+
+        if (pendingFoodName != null && pendingFoodCalories != -1) {
+            // Add the pending food to the list now that we're back from MealLogging
+            foodList.add("$pendingFoodName - $pendingFoodCalories kcal")
+            totalCalories += pendingFoodCalories
+            adapter.notifyDataSetChanged()
+            tvTotalCalories.text = "Total Calories: $totalCalories"
+
+            // Clear the pending entries
+            prefs.edit()
+                .remove("pending_food_name")
+                .remove("pending_food_calories")
+                .apply()
         }
     }
 }
